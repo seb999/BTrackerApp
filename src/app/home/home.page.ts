@@ -1,4 +1,5 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
+declare var require: any; //mandatory to avoid bug on compiling for leaf icon
 import { NavController } from '@ionic/angular';
 import { AuthService } from '../auth/auth.service';
 import { IUserInfo } from '../auth/user-info.model';
