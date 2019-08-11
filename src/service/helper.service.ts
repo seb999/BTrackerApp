@@ -10,8 +10,11 @@ export class HelperService {
 
     // public result : any;
     constructor(private storage: Storage, public alertCtrl: AlertController, private platform: Platform) {
-
     }
+
+    private onDevice(): boolean {
+        return this.platform.is('cordova');
+      }
 
     //Return current date method
     getCurrentDate(): string {
@@ -22,15 +25,8 @@ export class HelperService {
 
     //Return URL from API method to access depend on running on device or runing on browser
     urlBuilder(path: string): string {
-        if (this.platform.is('mobile')) {
-            this.isApp = true;
-        } else {
-            this.isApp = false;
-        }
-
-        if (!this.isApp) { this.baseUrl = "http://dspx.eu/btrackerweb"; }
-        if (this.isApp) { this.baseUrl = "https://localhost:5001"; }
-        return this.baseUrl + path;
+        const baseUrl = this.onDevice() ? 'http://dspx.eu/btrackerweb' : 'https://localhost:5001';
+        return baseUrl + path;
     }
 
     resetStorage() {

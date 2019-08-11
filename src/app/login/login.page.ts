@@ -17,7 +17,7 @@ export class LoginPage implements OnInit {
   ngOnInit() {
     this.authService.authObservable.subscribe((action) => {
       this.action = action;
-      if (action.action === AuthActions.SignInSuccess) {
+      if (action.action === AuthActions.SignInSuccess|| action.action === AuthActions.AuthSignInSuccess) {
         this.navCtrl.navigateRoot('home');
       }
     });

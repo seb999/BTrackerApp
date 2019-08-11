@@ -64,7 +64,14 @@ export class HomePage {
 
   public async getUserTokenAndLoadData(): Promise<void> {
     this.userToken = await this.authService.getValidToken();
+    this.checkLocalUserId();
     this.getDeviceStatus();
+  }
+
+  checkLocalUserId(){
+    let url = this.helperService.urlBuilder("/api/user/CheckLocalUserId/");
+    this.http.get<any>(url, { headers: { Authorization: 'Bearer ' + this.userToken.accessToken } }).subscribe(data => {
+    }, err => { });
   }
 
   getDeviceStatus() {
