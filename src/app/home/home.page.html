@@ -10,24 +10,19 @@
 </ion-header>
 
 <ion-content>
-
   <ion-card *ngIf="authenticated">
     <ion-card-header>
       Trackers
     </ion-card-header>
-
     <ion-card-content>
       <ion-list>
         <ion-item *ngFor="let tracker of trackerList" (click)="showLastPosition($event,tracker)">
           <ion-icon slot="start" name="md-arrow-dropright" style="margin: 0px" item-start large
-            *ngIf=tracker.deviceDisplay color="primary"></ion-icon>
-          <ion-icon slot="start" style="margin: 0px" item-start large *ngIf=!tracker.deviceDisplay></ion-icon>
-
-          <ion-label> {{ tracker.deviceDescription }}</ion-label>
-
-          <ion-toggle slot="end" color="secondary" [(ngModel)]="tracker.deviceStatus" [checked]="tracker.deviceStatus"
+            *ngIf=tracker.isDisplayOnMap color="primary"></ion-icon>
+          <ion-icon slot="start" style="margin: 0px" item-start large *ngIf=!tracker.isDisplayOnMap></ion-icon>
+          <ion-label> {{ tracker.description }}</ion-label>
+          <ion-toggle slot="end" color="secondary" [(ngModel)]="tracker.status" [checked]="tracker.status"
             (ionChange)="saveAlarm(tracker)" (click)="$event.stopPropagation()"></ion-toggle>
-
         </ion-item>
       </ion-list>
     </ion-card-content>
@@ -35,7 +30,4 @@
 
   <div id="map" style="height:75%; width: 95%;margin:10px"></div>
 
-  
 </ion-content>
-
-

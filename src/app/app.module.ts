@@ -11,6 +11,7 @@ import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
 import { AuthModule } from './auth/auth.module';
 import { IonicStorageModule } from '@ionic/storage';
+import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 
 import { HelperService } from '../service/helper.service';
 
@@ -22,6 +23,7 @@ import { HelperService } from '../service/helper.service';
     StatusBar,
     SplashScreen,
     HelperService,
+    LocalNotifications,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
   bootstrap: [AppComponent]
