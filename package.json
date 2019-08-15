@@ -28,6 +28,7 @@
         "@ionic/storage": "^2.2.0",
         "@oktadev/schematics": "^0.8.3",
         "cordova-android": "8.0.0",
+        "cordova-ios": "5.0.1",
         "cordova-plugin-advanced-http": "^2.1.1",
         "cordova-plugin-customurlscheme": "^4.4.0",
         "cordova-plugin-device": "^2.0.2",

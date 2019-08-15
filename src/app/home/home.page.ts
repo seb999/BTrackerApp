@@ -216,7 +216,7 @@ export class HomePage {
       //Push notification on device
       this.localNotifications.schedule({
         id: 1,
-        text: 'BTracker Warning!',
+        text: 'PUSH : BTracker Warning!',
         sound: 'file://sound.mp3',
         data: { secret: 999 }
       });

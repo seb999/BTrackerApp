@@ -25,8 +25,8 @@ export class HelperService {
 
     //Return URL from API method to access depend on running on device or runing on browser
     urlBuilder(path: string): string {
-        // const baseUrl = this.onDevice() ? 'http://dspx.eu/btrackerweb' : 'https://localhost:5001';
-        const baseUrl = this.onDevice() ? 'http://dspx.eu' : 'http://dspx.eu';
+      // const baseUrl = this.onDevice() ? 'http://dspx.eu' : 'http://localhost:5222';
+       const baseUrl = this.onDevice() ? 'http://dspx.eu' : 'http://dspx.eu';
         return baseUrl + path;
     }
 
