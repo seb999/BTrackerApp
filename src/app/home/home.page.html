@@ -20,7 +20,8 @@
           <ion-icon slot="start" name="md-arrow-dropright" style="margin: 0px" item-start large
             *ngIf=tracker.isDisplayOnMap color="primary"></ion-icon>
           <ion-icon slot="start" style="margin: 0px" item-start large *ngIf=!tracker.isDisplayOnMap></ion-icon>
-          <ion-label> {{ tracker.description }}</ion-label>
+          <ion-label> {{ tracker.deviceDescription }}</ion-label>
+          <ion-badge color="danger">{{ tracker.alert }}</ion-badge>
           <ion-toggle slot="end" color="secondary" [(ngModel)]="tracker.status" [checked]="tracker.status"
             (ionChange)="saveAlarm(tracker)" (click)="$event.stopPropagation()"></ion-toggle>
         </ion-item>

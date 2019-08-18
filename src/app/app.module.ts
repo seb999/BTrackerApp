@@ -12,8 +12,12 @@ import { HttpClientModule } from '@angular/common/http';
 import { AuthModule } from './auth/auth.module';
 import { IonicStorageModule } from '@ionic/storage';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
+import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 
-import { HelperService } from '../service/helper.service';
+import { HelperService } from '../service/helperService';
+import { StorageService } from '../service/storageService';
+import { HttpService } from '../service/httpService';
+
 
 @NgModule({
   declarations: [AppComponent],
@@ -23,7 +27,10 @@ import { HelperService } from '../service/helper.service';
     StatusBar,
     SplashScreen,
     HelperService,
+    HttpService,
+    StorageService,
     LocalNotifications,
+    BackgroundMode,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
   bootstrap: [AppComponent]

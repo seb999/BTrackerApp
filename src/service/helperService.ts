@@ -1,18 +1,17 @@
 import { Injectable, } from '@angular/core';
 import { Storage } from '@ionic/storage';
-import { AlertController, Platform } from '@ionic/angular';
+import { ToastController, Platform } from '@ionic/angular';
 
 @Injectable()
 
 export class HelperService {
-    private isApp: boolean;
     baseUrl: string = "";
 
     // public result : any;
-    constructor(private storage: Storage, public alertCtrl: AlertController, private platform: Platform) {
+    constructor(private storage: Storage, public toast: ToastController, private platform: Platform) {
     }
 
-    private onDevice(): boolean {
+    public onDevice(): boolean {
         return this.platform.is('cordova');
       }
 
@@ -30,22 +29,12 @@ export class HelperService {
         return baseUrl + path;
     }
 
-    resetStorage() {
-        this.storage.remove("AlarmStatus");
-    }
-
-    popup(myTitle: string, mySubTitle: string) {
-        let alert = this.alertCtrl.create({
-            //title: myTitle,
-            //subTitle: mySubTitle,
-            buttons: [{
-                text: 'OK', role: 'cancel',
-                handler: () => {
-                    // this.alertClosed = true;  
-                }
-            }]
+    async presentToast(tracker) {
+        var status = tracker.status ? "On" : "Off";
+        const toast = await this.toast.create({
+          message: "Tracker: " + tracker.deviceDescription + ' Alarm ' + status,
+          duration: 2000
         });
-
-       // alert..present();
-    }
+        toast.present();
+      }
 }

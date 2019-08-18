@@ -11,18 +11,75 @@
 
 
 <ion-content *ngIf="authenticated">
- 
-  <ion-button expand="round">Add tracker</ion-button>
-<!-- List of Input Items -->
-<ion-list >
-  <ion-item *ngFor="let item of trackerList">
-    <ion-icon name="ios-navigate" slot="start"></ion-icon>
-    {{item.deviceDescription}}
-    <div class="item-note" slot="end">
-      {{item.deviceEUI}}
-    </div>
+  <ion-item>
+    <ion-label>Add new tracker</ion-label>
+    <ion-button slot="end" (click)="editMode=true;addMode()">
+      <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+      Add
+    </ion-button>
   </ion-item>
-</ion-list>
+  <!-- List of Input Items -->
+  <ion-list>
+    <ion-item *ngFor="let tracker of trackerList" (click)="showDevice(tracker);viewMode=true">
+      <ion-icon name="ios-navigate" slot="start" color="primary"></ion-icon>
+      {{tracker.deviceDescription}}
+      <div class="item-note" slot="end">
+        {{tracker.deviceEUI}}
+      </div>
+    </ion-item>
+  </ion-list>
+
+  <ion-card *ngIf="editMode==true||viewMode==true">
+    <form (ngSubmit)="editMode=false;saveTracker()">
+    <ion-item >
+      <ion-button slot="end" (click)="editMode=true" *ngIf="!editMode" type="button">
+        <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+        Edit
+      </ion-button>
+      <ion-button slot="end" *ngIf="editMode" color="success" type="submit">
+        <ion-icon name="add-circle-outline" slot="start" ></ion-icon>
+        Save
+      </ion-button>
+      <ion-button slot="end" (click)="editMode=false;viewMode=false;cancelEditMode();" *ngIf="editMode" color="warning" type="button">
+        <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+        Cancel
+      </ion-button>
+    </ion-item>
+
+  
+    <ion-item lines="full">
+      <ion-label color="primary" slot="start">Device</ion-label>
+      <div class="item-note" slot="end" *ngIf="!editMode">
+        {{ selectedDevice.deviceDescription }}
+      </div>
+      <ion-input *ngIf="editMode" [(ngModel)]="selectedDevice.deviceDescription" placeholder="Enter a name" required name="deviceDescription"> </ion-input>
+    </ion-item>
+
+    <ion-item lines="full">
+      <ion-label color="primary" slot="start">EUI</ion-label>
+      <div class="item-note" slot="end" *ngIf="!editMode" style="width: 160px">
+        {{ selectedDevice.deviceEUI}}
+      </div>
+      <ion-input *ngIf="editMode" [(ngModel)]="selectedDevice.deviceEUI" placeholder="Enter EUI" required name="deviceEUI"></ion-input>
+    </ion-item>
+
+    <ion-item *ngIf="!editMode" lines="full">
+      <ion-label *ngIf="!editMode" color="primary" slot="start">Date added:</ion-label>
+      <ion-datetime *ngIf="!editMode" fixed displayFormat="DD/MM/YYYY" [(ngModel)]="selectedDevice.dateAdded" name="dateCration"
+        slot="end"></ion-datetime>
+    </ion-item>
+
+    <ion-item *ngIf="!editMode" lines="full">
+      <ion-label *ngIf="!editMode" color="primary" slot="start">Device ID:</ion-label>
+      <div class="item-note" slot="end" *ngIf="!editMode">
+        {{selectedDevice.deviceId}}
+      </div>
+
+    </ion-item>
+
+  </form>
+
+  </ion-card>
 
 
 </ion-content>
