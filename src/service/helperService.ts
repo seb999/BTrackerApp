@@ -18,8 +18,7 @@ export class HelperService {
     //Return current date method
     getCurrentDate(): string {
         let currentDate = new Date();
-        console.log(new Date(currentDate.getTime() - (currentDate.getTimezoneOffset() * 60000)));
-        return new Date(currentDate.getTime() - (currentDate.getTimezoneOffset() * 60000)).toISOString().split('.')[0];
+        return new Date(currentDate.getTime() + (currentDate.getTimezoneOffset() * 60000)).toISOString().split('.')[0];
     }
 
     //Return URL from API method to access depend on running on device or runing on browser
@@ -37,4 +36,6 @@ export class HelperService {
         });
         toast.present();
       }
+
+    
 }

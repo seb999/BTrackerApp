@@ -19,6 +19,7 @@ import { antPath } from 'leaflet-ant-path';
 import 'leaflet/dist/leaflet.css';
 import { timer } from 'rxjs';
 import { HttpSettings } from 'src/service/httpSetting';
+import { CheckAlarmService } from '../check-alarm.service';
 delete leaflet.Icon.Default.prototype._getIconUrl;
 leaflet.Icon.Default.mergeOptions({
   iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
@@ -41,26 +42,21 @@ export class HomePage {
   userToken: any;
   trackerList: Array<any> = [];
   trackerAlarmList: Array<any> = [];
-  timer: any;
-  timerSubscriber: any;
-  alertClosed: boolean = true;
 
   constructor(private navCtrl: NavController,
     private authService: AuthService,
-    private localNotifications: LocalNotifications,
-    public alertCtrl: AlertController,
     private helperService: HelperService,
     private storageService: StorageService,
     private httpService: HttpService,
     private http: HttpClient,
-    private backgroundMode: BackgroundMode) {
+    private backgroundMode: BackgroundMode,
+    private checkAlarmService  : CheckAlarmService) {
 
-    this.backgroundMode.enable();
-    this.timer = timer(2000, 15000);
+    //this.backgroundMode.enable();
   }
 
   ngOnInit() {
-    console.log("init");
+
     this.authService.authObservable.subscribe((action) => {
       this.action = action;
       if (action.action === AuthActions.SignInSuccess || action.action === AuthActions.AuthSignInSuccess) {
@@ -81,7 +77,7 @@ export class HomePage {
     this.validateLocalUserId();
     this.trackerList = await this.loadTrackerList();
     this.trackerAlarmList = await this.storageService.getItem<Array<any>>("alarmStatus");
-    this.initAlarm(this.trackerList, this.trackerAlarmList);
+    this.initUI(this.trackerList, this.trackerAlarmList);
     this.alarmOnOff()
   }
 
@@ -100,7 +96,7 @@ export class HomePage {
     return await this.httpService.xhr(httpSetting);
   }
 
-  async initAlarm(trackerList, trackerAlarmList) {
+  async initUI(trackerList, trackerAlarmList) {
     if (trackerAlarmList == null) {
       this.trackerList.forEach(tracker => { tracker.status = false; });
     }
@@ -121,12 +117,10 @@ export class HomePage {
     })
 
     if (isOneAlarmOn) {
-      this.timerSubscriber = this.timer.subscribe(() => {
-        this.checkMotion();
-      });
+      this.checkAlarmService.startTimer(this.trackerList);
     }
     else {
-      if (this.timerSubscriber != undefined) this.timerSubscriber.unsubscribe();
+      this.checkAlarmService.stopTimer();
     }
   };
 
@@ -195,55 +189,5 @@ export class HomePage {
     this.helperService.presentToast(tracker);
     this.storageService.setItem<Array<any>>("alarmStatus", this.trackerList);
     this.alarmOnOff();
-  }
-
-  async checkMotion() {
-    for (let index = 0; index < this.trackerList.length; index++) {
-      if (this.trackerList[index].status) {
-        let isMotionDetected = await this.getMotion(this.trackerList[index].deviceEUI);
-        if (isMotionDetected && this.alertClosed) {
-          this.trackerList[index].alert = "Alarm";
-          this.showAlert(this.trackerList[index].deviceDescription);
-        }
-      }
-    }
-  }
-
-  async getMotion(trackerEUI): Promise<boolean> {
-    const httpSetting: HttpSettings = {
-      method: "GET",
-      headers: { Authorization: 'Bearer ' + this.userToken.accessToken },
-      url: this.helperService.urlBuilder("/api/loc/getMotion/" + trackerEUI + "/" + this.helperService.getCurrentDate()),
-    };
-    return await this.httpService.xhr(httpSetting);
-  }
-
-  async showAlert(trackerDescription: string) {
-    if (this.helperService.onDevice()) {
-      //Push notification on device
-      this.localNotifications.schedule({
-        id: 1,
-        text: 'PUSH : BTracker Warning!',
-        sound: 'file://sound.mp3',
-        data: { secret: 999 }
-      });
-    }
-    else {
-      //alert popup on browser
-      if (!this.alertClosed) return;
-      this.alertClosed = false;
-      const alert = await this.alertCtrl.create({
-        header: 'BTracker Warning!',
-        subHeader: 'Motion detected on tracker: ',
-        message: trackerDescription,
-        buttons: [{
-          text: 'OK', role: 'cancel',
-          handler: () => {
-            this.alertClosed = true;
-          }
-        }]
-      });
-      await alert.present();
-    }
   }
 }
