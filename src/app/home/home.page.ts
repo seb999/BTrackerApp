@@ -1,7 +1,6 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import { NavController, AlertController } from '@ionic/angular';
+import { NavController } from '@ionic/angular';
 import { HttpClient } from '@angular/common/http';
-import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 
 import { AuthService } from '../auth/auth.service';
@@ -19,8 +18,7 @@ declare var require: any;
 import leaflet from 'leaflet';
 import { antPath } from 'leaflet-ant-path';
 import 'leaflet/dist/leaflet.css';
-import { timer } from 'rxjs';
-import { CheckAlarmService } from '../check-alarm.service';
+import { AlarmService } from '../alarm.service';
 delete leaflet.Icon.Default.prototype._getIconUrl;
 leaflet.Icon.Default.mergeOptions({
   iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
@@ -44,8 +42,8 @@ export class HomePage {
   trackerList: Array<any> = [];
   trackerAlarmList: Array<any> = [];
 
-  loraMessageEndpoint: "http://127.0.0.1:4001";
-  //loraMessageEndpoint: "http://dspx.eu/MQTT";
+  loraMessageEndpoint: string = "http://127.0.0.1:4001";
+  //loraMessageEndpoint: string =  "http://dspx.eu:1884";
   payloadDeviceId: 0
 
   constructor(private navCtrl: NavController,
@@ -55,7 +53,7 @@ export class HomePage {
     private httpService: HttpService,
     private http: HttpClient,
     private backgroundMode: BackgroundMode,
-    private checkAlarmService  : CheckAlarmService) {
+    private checkAlarmService: AlarmService) {
 
     //this.backgroundMode.enable();
   }
@@ -84,7 +82,6 @@ export class HomePage {
     this.trackerList = await this.loadTrackerList();
     this.trackerAlarmList = await this.storageService.getItem<Array<any>>("alarmStatus");
     this.initUI(this.trackerList, this.trackerAlarmList);
-    this.alarmOnOff()
   }
 
   async validateLocalUserId() {
@@ -114,34 +111,14 @@ export class HomePage {
   }
 
   initLoraListener = () => {
-    const socket = socketIOClient(this.loraMessageEndpoint, this.payloadDeviceId,);
-    socket.on("FromLoraTracker", (data: any) => {
-      this.payloadDeviceId = data;
-      console.log(data);
-      setTimeout(() => {
-        this.payloadDeviceId= 0;
-        //reload the map
-      }, 5000);
+    console.log(this.loraMessageEndpoint);
+    const socket = socketIOClient(this.loraMessageEndpoint, this.payloadDeviceId);
+    socket.on("FromLoraTracker", (trackerEUI: any) => {
+      //Display Alert and raise notification from here
+      this.checkAlarmService.checkAlert(this.trackerList, trackerEUI);
     }
     );
   }
-
-  alarmOnOff() {
-    //if there is one alarm true then we start timer otherwise we stop it
-    let isOneAlarmOn: boolean = false;
-    this.trackerList.forEach((tracker, index) => {
-      if (tracker.status) {
-        isOneAlarmOn = true;
-      }
-    })
-
-    if (isOneAlarmOn) {
-      this.checkAlarmService.startTimer(this.trackerList);
-    }
-    else {
-      this.checkAlarmService.stopTimer();
-    }
-  };
 
   initMap() {
     //Remove the map if we reload the page otherwise it crash the APP
@@ -207,6 +184,5 @@ export class HomePage {
     tracker.alert = "";
     this.helperService.presentToast(tracker);
     this.storageService.setItem<Array<any>>("alarmStatus", this.trackerList);
-    this.alarmOnOff();
   }
 }

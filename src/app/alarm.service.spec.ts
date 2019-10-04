@@ -1,12 +1,11 @@
 import { TestBed } from '@angular/core/testing';
-
-import { CheckAlarmService } from './check-alarm.service';
+import { AlarmService } from './alarm.service';
 
 describe('CheckAlarmService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));
 
   it('should be created', () => {
-    const service: CheckAlarmService = TestBed.get(CheckAlarmService);
+    const service: AlarmService = TestBed.get(AlarmService);
     expect(service).toBeTruthy();
   });
 });
