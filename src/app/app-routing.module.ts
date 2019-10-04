@@ -9,6 +9,7 @@ const routes: Routes = [
   { path: 'tracker', loadChildren: () => import('./tracker/tracker.module').then(m => m.TrackerPageModule)},
   { path: 'implicit/callback', loadChildren: './auth/implicit/auth-callback/auth-callback.module#AuthCallbackPageModule' },
   { path: 'implicit/logout', loadChildren: './auth/implicit/end-session/end-session.module#EndSessionPageModule' },
+  { path: 'gps/:deviceId', loadChildren: './gps/gps.module#GpsPageModule' },
 ];
 @NgModule({
   imports: [

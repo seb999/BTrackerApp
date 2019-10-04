@@ -1,14 +1,15 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { NavController } from '@ionic/angular';
-import { HttpClient } from '@angular/common/http';
+
 import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 
 import { AuthService } from '../auth/auth.service';
 import { IUserInfo } from '../auth/user-info.model';
 import { AuthActions, IAuthAction } from 'ionic-appauth';
-
 import { HelperService } from '../../service/helperService';
 import { StorageService } from '../../service/storageService';
+
+import { HttpClient } from '@angular/common/http';
 import { HttpService } from '../../service/httpService';
 import { HttpSettings } from 'src/service/httpSetting';
 
@@ -19,6 +20,7 @@ import leaflet from 'leaflet';
 import { antPath } from 'leaflet-ant-path';
 import 'leaflet/dist/leaflet.css';
 import { AlarmService } from '../alarm.service';
+import { GpsPage } from '../gps/gps.page';
 delete leaflet.Icon.Default.prototype._getIconUrl;
 leaflet.Icon.Default.mergeOptions({
   iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
@@ -42,8 +44,8 @@ export class HomePage {
   trackerList: Array<any> = [];
   trackerAlarmList: Array<any> = [];
 
-  loraMessageEndpoint: string = "http://127.0.0.1:4001";
-  //loraMessageEndpoint: string =  "http://dspx.eu:1884";
+  //loraMessageEndpoint: string = "http://127.0.0.1:4001";
+  loraMessageEndpoint: string =  "http://dspx.eu:1884";
   payloadDeviceId: 0
 
   constructor(private navCtrl: NavController,
@@ -178,6 +180,10 @@ export class HomePage {
       this.markerStart.addTo(this.map);
 
     }, err => { });
+  }
+
+  async navGpsPage(event, selectedTracker) {
+    this.navCtrl.navigateForward('/gps/' + selectedTracker.deviceId);
   }
 
   saveAlarm(tracker) {

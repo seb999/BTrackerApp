@@ -15,7 +15,7 @@ export class AppComponent {
   public authenticated: boolean;
   public appPages = [
     {
-      title: 'Localisation',
+      title: 'Dashboard',
       url: '/home',
       icon: 'ios-navigate'
     },

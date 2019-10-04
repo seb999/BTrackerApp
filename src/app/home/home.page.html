@@ -4,7 +4,7 @@
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
     <ion-title>
-      Localisation
+      Dashboard
     </ion-title>
   </ion-toolbar>
 </ion-header>
@@ -17,13 +17,18 @@
     <ion-card-content>
       <ion-list>
         <ion-item *ngFor="let tracker of trackerList" (click)="showLastPosition($event,tracker)">
-          <ion-icon slot="start" name="md-arrow-dropright" style="margin: 0px" item-start large
-            *ngIf=tracker.isDisplayOnMap color="primary"></ion-icon>
+          
+          <ion-icon slot="start" name="md-arrow-dropright" style="margin: 0px" item-start large *ngIf=tracker.isDisplayOnMap color="primary"></ion-icon>
           <ion-icon slot="start" style="margin: 0px" item-start large *ngIf=!tracker.isDisplayOnMap></ion-icon>
+       
           <ion-label> {{ tracker.deviceDescription }}</ion-label>
+         
           <ion-badge color="danger">{{ tracker.alert }}</ion-badge>
-          <ion-toggle slot="end" color="secondary" [(ngModel)]="tracker.status" [checked]="tracker.status"
-            (ionChange)="saveAlarm(tracker)" (click)="$event.stopPropagation()"></ion-toggle>
+         
+          <ion-toggle slot="end" color="secondary" [(ngModel)]="tracker.status" [checked]="tracker.status" (ionChange)="saveAlarm(tracker)" (click)="$event.stopPropagation()"></ion-toggle>
+
+          <ion-icon slot="end" name="ios-arrow-forward" (click)="navGpsPage($event,tracker)"></ion-icon>
+
         </ion-item>
       </ion-list>
     </ion-card-content>

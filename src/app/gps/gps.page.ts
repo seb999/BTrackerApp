@@ -1,28 +1,36 @@
 import { Component, OnInit } from '@angular/core';
+import { NavController } from '@ionic/angular';
+import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
 import { AuthActions, IAuthAction } from 'ionic-appauth';
-import { HelperService } from '../../service/helperService';
+import { HttpClient } from '@angular/common/http';
+import { HttpService } from '../../service/httpService';
 import { HttpSettings } from 'src/service/httpSetting';
-import { HttpService } from 'src/service/httpService';
+import { HelperService } from '../../service/helperService';
 
 @Component({
-  selector: 'app-tracker',
-  templateUrl: 'tracker.page.html',
-  styleUrls: ['tracker.page.scss'],
+  selector: 'app-gps',
+  templateUrl: './gps.page.html',
+  styleUrls: ['./gps.page.scss'],
 })
-export class TrackerPage {
+export class GpsPage implements OnInit {
+  action: IAuthAction;
   authenticated: boolean;
+  gpsList: Array<any> = [];
   userToken: any;
-  trackerList:Array<any>;
-  selectedDevice : any = {"deviceDescription" : ""};
 
-  constructor(private authService: AuthService,
+  constructor( private navCtrl: NavController,
     private helperService: HelperService,
-    private httpService: HttpService, ) {
+    private route :ActivatedRoute,
+    private authService: AuthService,
+    private httpService: HttpService,
+    private http: HttpClient) { 
+
   }
 
   ngOnInit() {
     this.authService.authObservable.subscribe((action) => {
+      this.action = action;
       if (action.action === AuthActions.SignInSuccess || action.action === AuthActions.AuthSignInSuccess) {
         {
           this.authenticated = true;
@@ -35,41 +43,31 @@ export class TrackerPage {
     });
   }
 
-  public async continue(): Promise<void> {
+  async continue(): Promise<void> {
     this.userToken = await this.authService.getValidToken();
-    this.trackerList = await this.loadTrackerList();
+    this.gpsList = await this.loadGpsList();
+    console.log(this.gpsList);
   }
 
-  showDevice(device){
-    this.selectedDevice = device;
-  }
-
-  async loadTrackerList(): Promise<Array<any>> {
+  async loadGpsList(): Promise<Array<any>> {
+    let deviceId = this.route.snapshot.paramMap.get('deviceId');
     const httpSetting: HttpSettings = {
       method: "GET",
       headers: { Authorization: 'Bearer ' + this.userToken.accessToken },
-      url: this.helperService.urlBuilder("/api/Device/GetDeviceList/"),
+      url: this.helperService.urlBuilder("/api/Loc/GetGpsData/" + deviceId + "/100"),
     };
     return await this.httpService.xhr(httpSetting);
   }
 
-  addMode(){
-    this.selectedDevice = {"deviceDescription" : "", "deviceEUI" : ""};
-  }
-
-  async saveTracker(){
-    this.selectedDevice = {"deviceDescription" : "", "deviceEUI" : ""};
-
+  async deleteGps(event, gpsData) {
     const httpSetting: HttpSettings = {
-      method: "POST",
+      method: "GET",
       headers: { Authorization: 'Bearer ' + this.userToken.accessToken },
-      url: this.helperService.urlBuilder("/api/Device/SaveDevice/"),
-      data: this.selectedDevice,
+      url: this.helperService.urlBuilder("/api/Loc/DeleteData/" + gpsData.gpsPositionId),
     };
     return await this.httpService.xhr(httpSetting);
+    //this.loadGpsList();
   }
 
-  cancelEditMode(){
-    this.selectedDevice = {"deviceDescription" : "", "deviceEUI" : ""};
-  }
+  
 }
