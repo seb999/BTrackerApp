@@ -11,14 +11,15 @@ import { AuthActions, IAuthAction } from 'ionic-appauth';
 import { HelperService } from '../../service/helperService';
 import { StorageService } from '../../service/storageService';
 import { HttpService } from '../../service/httpService';
+import { HttpSettings } from 'src/service/httpSetting';
 
+import socketIOClient from "socket.io-client";
 
 declare var require: any;
 import leaflet from 'leaflet';
 import { antPath } from 'leaflet-ant-path';
 import 'leaflet/dist/leaflet.css';
 import { timer } from 'rxjs';
-import { HttpSettings } from 'src/service/httpSetting';
 import { CheckAlarmService } from '../check-alarm.service';
 delete leaflet.Icon.Default.prototype._getIconUrl;
 leaflet.Icon.Default.mergeOptions({
@@ -42,6 +43,10 @@ export class HomePage {
   userToken: any;
   trackerList: Array<any> = [];
   trackerAlarmList: Array<any> = [];
+
+  loraMessageEndpoint: "http://127.0.0.1:4001";
+  //loraMessageEndpoint: "http://dspx.eu/MQTT";
+  payloadDeviceId: 0
 
   constructor(private navCtrl: NavController,
     private authService: AuthService,
@@ -74,6 +79,7 @@ export class HomePage {
   async continue(): Promise<void> {
     this.userToken = await this.authService.getValidToken();
     this.initMap();
+    this.initLoraListener();
     this.validateLocalUserId();
     this.trackerList = await this.loadTrackerList();
     this.trackerAlarmList = await this.storageService.getItem<Array<any>>("alarmStatus");
@@ -105,6 +111,19 @@ export class HomePage {
         tracker.status = this.trackerAlarmList[index].status;
       });
     }
+  }
+
+  initLoraListener = () => {
+    const socket = socketIOClient(this.loraMessageEndpoint, this.payloadDeviceId,);
+    socket.on("FromLoraTracker", (data: any) => {
+      this.payloadDeviceId = data;
+      console.log(data);
+      setTimeout(() => {
+        this.payloadDeviceId= 0;
+        //reload the map
+      }, 5000);
+    }
+    );
   }
 
   alarmOnOff() {
