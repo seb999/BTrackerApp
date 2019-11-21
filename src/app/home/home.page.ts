@@ -1,19 +1,16 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { NavController } from '@ionic/angular';
-
 import { BackgroundMode } from '@ionic-native/background-mode/ngx';
-
 import { AuthService } from '../auth/auth.service';
 import { IUserInfo } from '../auth/user-info.model';
 import { AuthActions, IAuthAction } from 'ionic-appauth';
 import { HelperService } from '../../service/helperService';
 import { StorageService } from '../../service/storageService';
-
 import { HttpClient } from '@angular/common/http';
 import { HttpService } from '../../service/httpService';
 import { HttpSettings } from 'src/service/httpSetting';
-
 import socketIOClient from "socket.io-client";
+import { MQTTService } from '../../service/MQTTService';
 
 declare var require: any;
 import leaflet from 'leaflet';
@@ -45,7 +42,7 @@ export class HomePage {
   trackerAlarmList: Array<any> = [];
 
   //loraMessageEndpoint: string = "http://127.0.0.1:4001";
-  loraMessageEndpoint: string =  "http://dspx.eu:1884";
+  //loraMessageEndpoint: string =  "http://dspx.eu:1884";
   payloadDeviceId: 0
 
   constructor(private navCtrl: NavController,
@@ -55,7 +52,8 @@ export class HomePage {
     private httpService: HttpService,
     private http: HttpClient,
     private backgroundMode: BackgroundMode,
-    private checkAlarmService: AlarmService) {
+    private checkAlarmService: AlarmService,
+    private mqttService: MQTTService) {
 
     //this.backgroundMode.enable();
   }
@@ -79,7 +77,7 @@ export class HomePage {
   async continue(): Promise<void> {
     this.userToken = await this.authService.getValidToken();
     this.initMap();
-    this.initLoraListener();
+    //this.initLoraListener();
     this.validateLocalUserId();
     this.trackerList = await this.loadTrackerList();
     this.trackerAlarmList = await this.storageService.getItem<Array<any>>("alarmStatus");
@@ -113,13 +111,19 @@ export class HomePage {
   }
 
   initLoraListener = () => {
-    console.log(this.loraMessageEndpoint);
-    const socket = socketIOClient(this.loraMessageEndpoint, this.payloadDeviceId);
-    socket.on("FromLoraTracker", (trackerEUI: any) => {
+    //const socket = socketIOClient(this.loraMessageEndpoint, this.payloadDeviceId);
+
+    this.mqttService.socketIO.on("FromLoraTracker", (trackerEUI: any) => {
       //Display Alert and raise notification from here
       this.checkAlarmService.checkAlert(this.trackerList, trackerEUI);
     }
     );
+
+    // socket.on("FromLoraTracker", (trackerEUI: any) => {
+    //   //Display Alert and raise notification from here
+    //   this.checkAlarmService.checkAlert(this.trackerList, trackerEUI);
+    // }
+    // );
   }
 
   initMap() {

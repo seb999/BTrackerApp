@@ -14,9 +14,11 @@ import { IonicStorageModule } from '@ionic/storage';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 
+// My services 
 import { HelperService } from '../service/helperService';
 import { StorageService } from '../service/storageService';
 import { HttpService } from '../service/httpService';
+import { MQTTService } from '../service/MQTTService';
 
 
 @NgModule({
@@ -29,6 +31,7 @@ import { HttpService } from '../service/httpService';
     HelperService,
     HttpService,
     StorageService,
+    MQTTService,
     LocalNotifications,
     BackgroundMode,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
