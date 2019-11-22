@@ -4,7 +4,7 @@ import { AuthActions, IAuthAction } from 'ionic-appauth';
 import { HelperService } from '../../service/helperService';
 import { HttpSettings } from 'src/service/httpSetting';
 import { HttpService } from 'src/service/httpService';
-import { MQTTService } from 'src/service/MQTTService';
+//import { MQTTService } from 'src/service/MQTTService';
 
 @Component({
   selector: 'app-tracker',
@@ -20,7 +20,8 @@ export class TrackerPage {
   constructor(private authService: AuthService,
     private helperService: HelperService,
     private httpService: HttpService,
-    private socketIoService: MQTTService) {
+   // private socketIoService: MQTTService
+    ) {
   }
 
   ngOnInit() {
@@ -42,17 +43,16 @@ export class TrackerPage {
     this.trackerList = await this.loadTrackerList();
 
     //Callback TTN save succeeded
-    this.socketIoService.socketIO.on("ttnAddSucceeded", (ttnDevID: string) => {
-
-      //Then save to server db
-      const httpSetting: HttpSettings = {
-        method: "POST",
-        headers: { Authorization: 'Bearer ' + this.userToken.accessToken },
-        url: this.helperService.urlBuilder("/api/Device/SaveDevice/"),
-        data: this.selectedDevice,
-      };
-      return this.httpService.xhr(httpSetting);
-    })
+    // this.socketIoService.socketIO.on("ttnAddSucceeded", (ttnDevID: string) => {
+    //   //Then save to server db
+    //   const httpSetting: HttpSettings = {
+    //     method: "POST",
+    //     headers: { Authorization: 'Bearer ' + this.userToken.accessToken },
+    //     url: this.helperService.urlBuilder("/api/Device/SaveDevice/"),
+    //     data: this.selectedDevice,
+    //   };
+    //   return this.httpService.xhr(httpSetting);
+    // })
   }
 
   showDevice(device) {
@@ -75,7 +75,7 @@ export class TrackerPage {
   async saveTracker() {
     //Save to MQTT
     let payload = { EUI: this.selectedDevice.deviceEui, Description: this.selectedDevice.deviceDescription }
-    this.socketIoService.socketIO.emit("ttnAddDevice", payload);
+    //this.socketIoService.socketIO.emit("ttnAddDevice", payload);
   }
 
   cancelEditMode() {

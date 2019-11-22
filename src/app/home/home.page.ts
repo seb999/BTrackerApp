@@ -10,7 +10,7 @@ import { HttpClient } from '@angular/common/http';
 import { HttpService } from '../../service/httpService';
 import { HttpSettings } from 'src/service/httpSetting';
 import socketIOClient from "socket.io-client";
-import { MQTTService } from '../../service/MQTTService';
+//import { MQTTService } from '../../service/MQTTService';
 
 declare var require: any;
 import leaflet from 'leaflet';
@@ -41,7 +41,7 @@ export class HomePage {
   trackerList: Array<any> = [];
   trackerAlarmList: Array<any> = [];
 
-  //loraMessageEndpoint: string = "http://127.0.0.1:4001";
+  loraMessageEndpoint: string = "http://127.0.0.1:4001";
   //loraMessageEndpoint: string =  "http://dspx.eu:1884";
   payloadDeviceId: 0
 
@@ -53,7 +53,8 @@ export class HomePage {
     private http: HttpClient,
     private backgroundMode: BackgroundMode,
     private checkAlarmService: AlarmService,
-    private mqttService: MQTTService) {
+    //private mqttService: MQTTService
+  ) {
 
     //this.backgroundMode.enable();
   }
@@ -77,17 +78,18 @@ export class HomePage {
   async continue(): Promise<void> {
     this.userToken = await this.authService.getValidToken();
     this.initMap();
-    //this.initLoraListener();
+    this.initLoraListener();
     this.validateLocalUserId();
     this.trackerList = await this.loadTrackerList();
-    this.trackerAlarmList = await this.storageService.getItem<Array<any>>("alarmStatus");
-    this.initUI(this.trackerList, this.trackerAlarmList);
   }
 
   async validateLocalUserId() {
-    let url = this.helperService.urlBuilder("/api/user/CheckLocalUserId/");
-    await this.http.get<any>(url, { headers: { Authorization: 'Bearer ' + this.userToken.accessToken } }).subscribe(data => {
-    }, err => { });
+    const httpSetting: HttpSettings = {
+      method: "GET",
+      headers: { Authorization: 'Bearer ' + this.userToken.accessToken },
+      url: this.helperService.urlBuilder("/api/user/CheckUserId/"),
+    };
+    return await this.httpService.xhr(httpSetting);
   }
 
   async loadTrackerList(): Promise<Array<any>> {
@@ -99,31 +101,21 @@ export class HomePage {
     return await this.httpService.xhr(httpSetting);
   }
 
-  async initUI(trackerList, trackerAlarmList) {
-    if (trackerAlarmList == null) {
-      this.trackerList.forEach(tracker => { tracker.status = false; });
-    }
-    else {
-      this.trackerList.forEach((tracker, index) => {
-        tracker.status = this.trackerAlarmList[index].status;
-      });
-    }
-  }
-
   initLoraListener = () => {
-    //const socket = socketIOClient(this.loraMessageEndpoint, this.payloadDeviceId);
+    // this.mqttService.openConnection();
+    const socket = socketIOClient(this.loraMessageEndpoint, this.payloadDeviceId);
 
-    this.mqttService.socketIO.on("FromLoraTracker", (trackerEUI: any) => {
-      //Display Alert and raise notification from here
-      this.checkAlarmService.checkAlert(this.trackerList, trackerEUI);
-    }
-    );
-
-    // socket.on("FromLoraTracker", (trackerEUI: any) => {
+    // this.mqttService.socketIO.on("FromLoraTracker", (trackerEUI: any) => {
     //   //Display Alert and raise notification from here
     //   this.checkAlarmService.checkAlert(this.trackerList, trackerEUI);
     // }
     // );
+
+    socket.on("FromLoraTracker", (trackerEUI: any) => {
+      //Display Alert and raise notification from here
+      this.checkAlarmService.checkAlert(this.trackerList, trackerEUI);
+    }
+    );
   }
 
   initMap() {
@@ -193,6 +185,13 @@ export class HomePage {
   saveAlarm(tracker) {
     tracker.alert = "";
     this.helperService.presentToast(tracker);
-    this.storageService.setItem<Array<any>>("alarmStatus", this.trackerList);
+
+    const httpSetting: HttpSettings = {
+      method: "POST",
+      headers: { Authorization: 'Bearer ' + this.userToken.accessToken },
+      url: this.helperService.urlBuilder("/api/Device/UpdateDevice/"),
+      data: tracker,
+    };
+    return this.httpService.xhr(httpSetting);
   }
 }

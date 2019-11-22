@@ -7,7 +7,7 @@ import { AlertController } from '@ionic/angular';
   providedIn: 'root'
 })
 export class AlarmService {
-  counter : number =0;
+  counter: number = 0;
   alertClosed: boolean = true;
 
   constructor(
@@ -16,13 +16,13 @@ export class AlarmService {
     public alertCtrl: AlertController,
   ) {
 
-   }
+  }
 
-  checkAlert(trackerList, trackerEUI){
+  checkAlert(trackerList, trackerEUI) {
     for (let index = 0; index < trackerList.length; index++) {
-      if (trackerList[index].status && trackerList[index].deviceEUI == trackerEUI){
+      if (trackerList[index].deviceIsAlarmOn && trackerList[index].deviceEUI == trackerEUI) {
         trackerList[index].alert = "Alarm";
-         this.showAlert(trackerList[index].deviceDescription);
+        this.showAlert(trackerList[index].deviceDescription);
       }
     }
   }

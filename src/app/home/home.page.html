@@ -25,7 +25,7 @@
          
           <ion-badge color="danger">{{ tracker.alert }}</ion-badge>
          
-          <ion-toggle slot="end" color="secondary" [(ngModel)]="tracker.status" [checked]="tracker.status" (ionChange)="saveAlarm(tracker)" (click)="$event.stopPropagation()"></ion-toggle>
+          <ion-toggle slot="end" color="secondary" [(ngModel)]="tracker.deviceIsAlarmOn" [checked]="tracker.status" (ionChange)="saveAlarm(tracker)" (click)="$event.stopPropagation()"></ion-toggle>
 
           <ion-icon slot="end" name="ios-arrow-forward" (click)="navGpsPage($event,tracker)"></ion-icon>
 
