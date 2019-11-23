@@ -1,13 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { HttpSettings } from './httpSetting';
 
-@Injectable()
-
+@Injectable({
+  providedIn: 'root'
+})
 export class HttpService {
 
-  constructor(private http: HttpClient) {
-  }
+  constructor(private http: HttpClient) { }
 
   public async xhr<T>(settings: HttpSettings): Promise<T> {
     if (!settings.method) {
@@ -34,7 +33,14 @@ export class HttpService {
         httpHeaders = httpHeaders.append(key, headers[key]);
       });
     }
-
     return httpHeaders;
   }
+}
+
+export interface HttpSettings {
+  url: string;
+  dataType?: string;
+  method?: "GET" | "POST" | "PUT" | "DELETE";
+  data?: any;
+  headers?: any;
 }

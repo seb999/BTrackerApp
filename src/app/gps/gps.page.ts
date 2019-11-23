@@ -4,9 +4,8 @@ import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
 import { AuthActions, IAuthAction } from 'ionic-appauth';
 import { HttpClient } from '@angular/common/http';
-import { HttpService } from '../../service/httpService';
-import { HttpSettings } from 'src/service/httpSetting';
-import { HelperService } from '../../service/helperService';
+import { HttpService, HttpSettings } from '../service/http.service';
+import { HelperService } from '../service/helper.service';
 
 @Component({
   selector: 'app-gps',

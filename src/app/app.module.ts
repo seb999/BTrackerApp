@@ -15,10 +15,10 @@ import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 
 // My services 
-import { HelperService } from '../service/helperService';
-import { StorageService } from '../service/storageService';
-import { HttpService } from '../service/httpService';
-import { MQTTService } from '../service/MQTTService';
+import { HelperService } from './service/helper.service';
+import { StorageService } from './service/storage.service';
+import { HttpService } from './service/http.service';
+import { MqttService } from './service/mqtt.service';
 
 
 @NgModule({
@@ -31,7 +31,7 @@ import { MQTTService } from '../service/MQTTService';
     HelperService,
     HttpService,
     StorageService,
-    MQTTService,
+    MqttService,
     LocalNotifications,
     BackgroundMode,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }

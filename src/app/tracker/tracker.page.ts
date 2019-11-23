@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../auth/auth.service';
 import { AuthActions, IAuthAction } from 'ionic-appauth';
-import { HelperService } from '../../service/helperService';
-import { HttpSettings } from 'src/service/httpSetting';
-import { HttpService } from 'src/service/httpService';
+import { HelperService } from '../service/helper.service';
+import { HttpService, HttpSettings } from '../service/http.service';
 //import { MQTTService } from 'src/service/MQTTService';
 
 @Component({

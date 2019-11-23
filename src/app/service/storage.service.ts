@@ -1,13 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage';
 
-
-@Injectable()
-
+@Injectable({
+  providedIn: 'root'
+})
 export class StorageService {
 
-  constructor(private storage: Storage) {
-  }
+  constructor(private storage: Storage) { }
 
   getItem<T>(name: string): Promise<T> {
     return this.storage.get(name);
@@ -24,4 +23,5 @@ export class StorageService {
   setItem<T>(name: string, value: T): Promise<void> {
     return this.storage.set(name, value);
   }
+  
 }

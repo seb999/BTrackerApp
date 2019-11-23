@@ -4,11 +4,10 @@ import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 import { AuthService } from '../auth/auth.service';
 import { IUserInfo } from '../auth/user-info.model';
 import { AuthActions, IAuthAction } from 'ionic-appauth';
-import { HelperService } from '../../service/helperService';
-import { StorageService } from '../../service/storageService';
+import { HelperService } from '../service/helper.service';
+import { StorageService } from '../service/storage.service';
 import { HttpClient } from '@angular/common/http';
-import { HttpService } from '../../service/httpService';
-import { HttpSettings } from 'src/service/httpSetting';
+import { HttpService, HttpSettings } from '../service/http.service';
 import socketIOClient from "socket.io-client";
 //import { MQTTService } from '../../service/MQTTService';
 
@@ -16,8 +15,7 @@ declare var require: any;
 import leaflet from 'leaflet';
 import { antPath } from 'leaflet-ant-path';
 import 'leaflet/dist/leaflet.css';
-import { AlarmService } from '../alarm.service';
-import { GpsPage } from '../gps/gps.page';
+import { AlarmService } from '../service/alarm.service';
 delete leaflet.Icon.Default.prototype._getIconUrl;
 leaflet.Icon.Default.mergeOptions({
   iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
@@ -182,10 +180,12 @@ export class HomePage {
     this.navCtrl.navigateForward('/gps/' + selectedTracker.deviceId);
   }
 
+  //Update alarm stracker
   saveAlarm(tracker) {
     tracker.alert = "";
     this.helperService.presentToast(tracker);
 
+    //Call backend and update alarm status
     const httpSetting: HttpSettings = {
       method: "POST",
       headers: { Authorization: 'Bearer ' + this.userToken.accessToken },

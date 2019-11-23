@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HelperService } from '../service/helperService';
+import { HelperService } from '../service/helper.service';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { AlertController } from '@ionic/angular';
 
