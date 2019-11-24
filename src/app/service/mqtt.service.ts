@@ -6,13 +6,12 @@ import socketIOClient from "socket.io-client";
 })
 export class MqttService {
   private loraMessageEndpoint: string = "http://127.0.0.1:4001";
-    //private loraMessageEndpoint: string = "http://dspx.eu:1884";
-    public socketIO : any;
-    public client: socketIOClient;
+  //private loraMessageEndpoint: string = "http://dspx.eu:1884";
+  public socketIO: any;
 
   constructor() { }
 
-  openConnection(){
-    this.socketIO = this.client(this.loraMessageEndpoint);
-}
+  openConnection() {
+    return socketIOClient(this.loraMessageEndpoint);
+  }
 }

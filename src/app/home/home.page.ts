@@ -8,8 +8,9 @@ import { HelperService } from '../service/helper.service';
 import { StorageService } from '../service/storage.service';
 import { HttpClient } from '@angular/common/http';
 import { HttpService, HttpSettings } from '../service/http.service';
+
 import socketIOClient from "socket.io-client";
-//import { MQTTService } from '../../service/MQTTService';
+import { MqttService } from '../service/mqtt.service';
 
 declare var require: any;
 import leaflet from 'leaflet';
@@ -46,12 +47,12 @@ export class HomePage {
   constructor(private navCtrl: NavController,
     private authService: AuthService,
     private helperService: HelperService,
-    private storageService: StorageService,
+    //private storageService: StorageService,
     private httpService: HttpService,
     private http: HttpClient,
     private backgroundMode: BackgroundMode,
     private checkAlarmService: AlarmService,
-    //private mqttService: MQTTService
+    private mqttService: MqttService
   ) {
 
     //this.backgroundMode.enable();
@@ -100,20 +101,22 @@ export class HomePage {
   }
 
   initLoraListener = () => {
-    // this.mqttService.openConnection();
-    const socket = socketIOClient(this.loraMessageEndpoint, this.payloadDeviceId);
+    let ttt = this.mqttService.openConnection();
+    ttt.on("ttnMotionDetected", (trackerEUI: any) => {
+      //Display Alert and raise notification from here
+      console.log(trackerEUI);
+      this.checkAlarmService.checkAlert(this.trackerList, trackerEUI);
+    }
+    );
 
-    // this.mqttService.socketIO.on("FromLoraTracker", (trackerEUI: any) => {
+    //With no Service
+    //const socket = socketIOClient(this.loraMessageEndpoint, this.payloadDeviceId);
+    // socket.on("ttnMotionDetected", (trackerEUI: any) => {
+    //   console.log(trackerEUI);
     //   //Display Alert and raise notification from here
     //   this.checkAlarmService.checkAlert(this.trackerList, trackerEUI);
     // }
     // );
-
-    socket.on("FromLoraTracker", (trackerEUI: any) => {
-      //Display Alert and raise notification from here
-      this.checkAlarmService.checkAlert(this.trackerList, trackerEUI);
-    }
-    );
   }
 
   initMap() {
