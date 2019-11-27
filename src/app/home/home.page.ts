@@ -39,10 +39,7 @@ export class HomePage {
   userToken: any;
   trackerList: Array<any> = [];
   trackerAlarmList: Array<any> = [];
-
-  loraMessageEndpoint: string = "http://127.0.0.1:4001";
-  //loraMessageEndpoint: string =  "http://dspx.eu:1884";
-  payloadDeviceId: 0
+  onMotionDelegate: any;
 
   constructor(private navCtrl: NavController,
     private authService: AuthService,
@@ -74,6 +71,11 @@ export class HomePage {
     });
   }
 
+  ngOnDestroy() {
+    this.onMotionDelegate.unsubscribe();
+    //Maybe you can call disconnect method from MQTT here ?
+  }
+
   async continue(): Promise<void> {
     this.userToken = await this.authService.getValidToken();
     this.initMap();
@@ -100,23 +102,21 @@ export class HomePage {
     return await this.httpService.xhr(httpSetting);
   }
 
-  initLoraListener = () => {
-    let ttt = this.mqttService.openConnection();
-    ttt.on("ttnMotionDetected", (trackerEUI: any) => {
-      //Display Alert and raise notification from here
-      console.log(trackerEUI);
-      this.checkAlarmService.checkAlert(this.trackerList, trackerEUI);
-    }
-    );
-
-    //With no Service
-    //const socket = socketIOClient(this.loraMessageEndpoint, this.payloadDeviceId);
-    // socket.on("ttnMotionDetected", (trackerEUI: any) => {
-    //   console.log(trackerEUI);
-    //   //Display Alert and raise notification from here
+  initLoraListener() {
+    //All done in Service
+    this.onMotionDelegate = this.mqttService.onMotion().subscribe(TracketEUI => this.checkAlarm(TracketEUI));
+    this.mqttService.openListener();
+    
+    // //from Service BASIC
+    // let ttt = this.mqttService.openConnection();
+    // ttt.on("ttnMotionDetected", (trackerEUI: any) => {
     //   this.checkAlarmService.checkAlert(this.trackerList, trackerEUI);
     // }
     // );
+  }
+
+  checkAlarm(trackerEUI: string) {
+    this.checkAlarmService.checkAlert(this.trackerList, trackerEUI);
   }
 
   initMap() {
