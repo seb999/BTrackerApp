@@ -1,9 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { AlertController } from '@ionic/angular';
 import { AuthService } from '../auth/auth.service';
-import { AuthActions, IAuthAction } from 'ionic-appauth';
+import { AuthActions } from 'ionic-appauth';
 import { HelperService } from '../service/helper.service';
 import { HttpService, HttpSettings } from '../service/http.service';
-//import { MQTTService } from 'src/service/MQTTService';
+import { MqttService } from '../service/mqtt.service';
+import { Device } from '../../class/device';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-tracker',
@@ -14,13 +17,16 @@ export class TrackerPage {
   authenticated: boolean;
   userToken: any;
   trackerList: Array<any>;
-  selectedDevice: any = { "deviceDescription": "" };
+  selectedDevice: Device = { "deviceDescription": "" };
+  onTrackerAdded: any;
 
   constructor(private authService: AuthService,
     private helperService: HelperService,
     private httpService: HttpService,
-   // private socketIoService: MQTTService
-    ) {
+    private mqttService: MqttService,
+    public alertController: AlertController,
+    public toast: ToastController,
+  ) {
   }
 
   ngOnInit() {
@@ -40,22 +46,7 @@ export class TrackerPage {
   public async continue(): Promise<void> {
     this.userToken = await this.authService.getValidToken();
     this.trackerList = await this.loadTrackerList();
-
-    //Callback TTN save succeeded
-    // this.socketIoService.socketIO.on("ttnAddSucceeded", (ttnDevID: string) => {
-    //   //Then save to server db
-    //   const httpSetting: HttpSettings = {
-    //     method: "POST",
-    //     headers: { Authorization: 'Bearer ' + this.userToken.accessToken },
-    //     url: this.helperService.urlBuilder("/api/Device/SaveDevice/"),
-    //     data: this.selectedDevice,
-    //   };
-    //   return this.httpService.xhr(httpSetting);
-    // })
-  }
-
-  showDevice(device) {
-    this.selectedDevice = device;
+    this.subscribeMQTTService();
   }
 
   async loadTrackerList(): Promise<Array<any>> {
@@ -67,17 +58,112 @@ export class TrackerPage {
     return await this.httpService.xhr(httpSetting);
   }
 
-  addMode() {
-    this.selectedDevice = { "deviceDescription": "", "deviceEUI": "" };
+  subscribeMQTTService() {
+    //On new device saved in TTN do that
+    this.mqttService.onAdded().subscribe(ttnDevID => {
+      this.dbSaveTracker(ttnDevID);
+      this.presentToast("saved!");
+    });
+
+    //On device deleted from TTN do that
+    this.mqttService.onDeleted().subscribe(() => {
+      this.dbDeleteTracker(this.selectedDevice.deviceId);
+      this.presentToast("deleted!")
+    });
+
+     //On device updated from TTN do that
+     this.mqttService.onUpdated().subscribe(() => {
+      this.dbUpdateTracker();
+      this.presentToast("Updated!")
+    });
+
+    //Start to listen MQTT events
+    this.mqttService.openListener();
   }
 
-  async saveTracker() {
+  async ttnSaveTracker() {
     //Save to MQTT
-    let payload = { EUI: this.selectedDevice.deviceEui, Description: this.selectedDevice.deviceDescription }
-    //this.socketIoService.socketIO.emit("ttnAddDevice", payload);
+    if (!this.selectedDevice.ttnDevID) {
+      this.mqttService.addTracker(this.selectedDevice.deviceEUI, this.selectedDevice.deviceDescription)
+    }
+    else {
+      this.mqttService.updateTracker(this.selectedDevice.deviceEUI, this.selectedDevice.deviceDescription, this.selectedDevice.ttnDevID)
+    }
   }
 
-  cancelEditMode() {
+  async ttnDeleteTracker() {
+    const alert = await this.alertController.create({
+      header: 'Warning',
+      message: 'Do you really want to delete this tracker ?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: (blah) => {
+            console.log('Confirm Cancel: blah');
+          }
+        }, {
+          text: 'Okay',
+          handler: () => {
+            //Delete to MQTT
+            this.mqttService.deleteTracker(this.selectedDevice.ttnDevID);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async dbSaveTracker(ttnDevID: any) {
+    this.selectedDevice.ttnDevID = ttnDevID;
+    //Save to db
+    const httpSetting: HttpSettings = {
+      method: "POST",
+      headers: { Authorization: 'Bearer ' + this.userToken.accessToken },
+      url: this.helperService.urlBuilder("/api/Device/SaveDevice/"),
+      data: this.selectedDevice,
+    };
+    return await this.httpService.xhr(httpSetting);
+  }
+
+  async dbDeleteTracker(ttnDevID: any) {
+    //delete to db
+    const httpSetting: HttpSettings = {
+      method: "GET",
+      headers: { Authorization: 'Bearer ' + this.userToken.accessToken },
+      url: this.helperService.urlBuilder("/api/Device/DeleteDevice/" + ttnDevID)
+    };
+    return await this.httpService.xhr(httpSetting);
+  }
+
+  async dbUpdateTracker() {
+    //Save to db
+    const httpSetting: HttpSettings = {
+      method: "POST",
+      headers: { Authorization: 'Bearer ' + this.userToken.accessToken },
+      url: this.helperService.urlBuilder("/api/Device/UpdateDevice/"),
+      data: this.selectedDevice,
+    };
+    return await this.httpService.xhr(httpSetting);
+  }
+
+  showDevice(device) {
+    this.selectedDevice = device;
+  }
+
+  clearEntry() {
     this.selectedDevice = { "deviceDescription": "", "deviceEUI": "" };
+  }
+
+  async presentToast(message) {
+    const toast = await this.toast.create({
+      message: "Tracker " + message,
+      duration: 4000
+    });
+    await toast.present();
+    let result = await toast.onDidDismiss();
+    this.trackerList = await this.loadTrackerList();
   }
 }

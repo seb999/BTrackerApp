@@ -9,7 +9,7 @@ import { StorageService } from '../service/storage.service';
 import { HttpClient } from '@angular/common/http';
 import { HttpService, HttpSettings } from '../service/http.service';
 
-import socketIOClient from "socket.io-client";
+//import socketIOClient from "socket.io-client";
 import { MqttService } from '../service/mqtt.service';
 
 declare var require: any;
@@ -56,7 +56,6 @@ export class HomePage {
   }
 
   ngOnInit() {
-
     this.authService.authObservable.subscribe((action) => {
       this.action = action;
       if (action.action === AuthActions.SignInSuccess || action.action === AuthActions.AuthSignInSuccess) {
@@ -103,16 +102,11 @@ export class HomePage {
   }
 
   initLoraListener() {
-    //All done in Service
+    //All done in mqttService injected in constructor
+    //1 - Subsribe to onMotion event
     this.onMotionDelegate = this.mqttService.onMotion().subscribe(TracketEUI => this.checkAlarm(TracketEUI));
+    //2 - Start to listen MQTT events
     this.mqttService.openListener();
-    
-    // //from Service BASIC
-    // let ttt = this.mqttService.openConnection();
-    // ttt.on("ttnMotionDetected", (trackerEUI: any) => {
-    //   this.checkAlarmService.checkAlert(this.trackerList, trackerEUI);
-    // }
-    // );
   }
 
   checkAlarm(trackerEUI: string) {

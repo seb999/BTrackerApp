@@ -24,9 +24,9 @@ export class MqttService {
     return socketIOClient(this.loraMessageEndpoint);
   }
 
-  ///////////////////////////////////////////
-  //1 - Client subscribe to those methods////
-  ///////////////////////////////////////////
+  //////////////////////////////////////////////////
+  //1 - Client subscribe to those events methods////
+  /////////////////////////////////////////////////
   public onMotion() {
     return this.eventMotionDetected;
   }
@@ -50,21 +50,24 @@ export class MqttService {
    // const socket = socketIOClient(this.loraMessageEndpoint);
 
     this.socket.on("ttnMotionDetected", (trackerEUI: any) => {
+      //Fire a local event that will be catch by UI
       return this.eventMotionDetected.emit(trackerEUI);
     });
 
-    this.socket.on("ttnAddSucceeded", (ttnDevID: string) => {
+    this.socket.on("ttnAddSucceeded", (ttnDevID: any) => {
+      //Fire a local event that will be catch by UI
       return this.eventAdded.emit(ttnDevID);
     })
 
     this.socket.on("ttnUpdateSucceeded", (ttnDevID: any) => {
+      //Fire a local event that will be catch by UI
       return this.eventUpdated.emit(ttnDevID);
     });
 
-    this.socket.on("ttnDeleteSucceeded", (ttnDevID: any) => {
-      return this.eventDeleted.emit(ttnDevID);
+    this.socket.on("ttnDeleteSucceeded", () => {
+      //Fire a local event that will be catch by UI
+      return this.eventDeleted.emit();
     });
-
   }
 
   ///////////////////////////
@@ -72,6 +75,7 @@ export class MqttService {
   ///////////////////////////
   public addTracker(deviceEui: any, deviceDescription: any) {
     let payload = { EUI: deviceEui, Description: deviceDescription }
+    console.log("payload from app : ", payload)
     this.socket.emit("ttnAddDevice", payload);
   }
 
