@@ -8,9 +8,9 @@ import { HelperService } from '../service/helper.service';
 import { StorageService } from '../service/storage.service';
 import { HttpClient } from '@angular/common/http';
 import { HttpService, HttpSettings } from '../service/http.service';
-
-//import socketIOClient from "socket.io-client";
+import { Geolocation } from '@ionic-native/geolocation/ngx'
 import { MqttService } from '../service/mqtt.service';
+import { gpsPosition } from '../../class/gpsPosition';
 
 declare var require: any;
 import leaflet from 'leaflet';
@@ -49,7 +49,8 @@ export class HomePage {
     private http: HttpClient,
     private backgroundMode: BackgroundMode,
     private checkAlarmService: AlarmService,
-    private mqttService: MqttService
+    private mqttService: MqttService,
+    private geoLocation: Geolocation
   ) {
 
     //this.backgroundMode.enable();
@@ -60,25 +61,25 @@ export class HomePage {
       this.action = action;
       if (action.action === AuthActions.SignInSuccess || action.action === AuthActions.AuthSignInSuccess) {
         {
+          console.log("authenticated");
           this.authenticated = true;
           this.continue();
         }
       } else {
         this.authenticated = false;
-        this.authService.signIn().catch(error => console.error(`Sign in error: ${error}`));
+        this.authService.signIn();
       }
     });
   }
 
   ngOnDestroy() {
     this.onMotionDelegate.unsubscribe();
-    //Maybe you can call disconnect method from MQTT here ?
   }
 
   async continue(): Promise<void> {
     this.userToken = await this.authService.getValidToken();
     this.initMap();
-    this.initLoraListener();
+    this.subscribeMQTTService();
     this.validateLocalUserId();
     this.trackerList = await this.loadTrackerList();
   }
@@ -101,12 +102,18 @@ export class HomePage {
     return await this.httpService.xhr(httpSetting);
   }
 
-  initLoraListener() {
+  subscribeMQTTService() {
     //All done in mqttService injected in constructor
     //1 - Subsribe to onMotion event
     this.onMotionDelegate = this.mqttService.onMotion().subscribe(TracketEUI => this.checkAlarm(TracketEUI));
     //2 - Start to listen MQTT events
     this.mqttService.openListener();
+  }
+
+  async getCurrentPosition(): Promise<gpsPosition> {
+    var resp = await this.geoLocation.getCurrentPosition();
+    const position: gpsPosition = { "latitude": resp.coords.latitude, "longitude": resp.coords.longitude };
+    return position;
   }
 
   checkAlarm(trackerEUI: string) {
@@ -119,11 +126,19 @@ export class HomePage {
       this.map.remove();
     }
 
-    this.map = leaflet.map("map").setView([51.505, -0.09], 13);
-    leaflet.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attributions: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-      maxZoom: 18
-    }).addTo(this.map);
+    //Get user current position and center map here
+    this.getCurrentPosition().then((gpsPosition) => {
+      this.map = leaflet.map("map").setView([gpsPosition.latitude, gpsPosition.longitude], 13);
+      this.markerStart = leaflet.marker([gpsPosition.latitude, gpsPosition.longitude]).bindPopup("<b>" + "Current position" + "</b><br>").openPopup();
+      this.markerStart.addTo(this.map);
+    }).catch(()=>{
+      this.map = leaflet.map("map").setView([51.505, -0.09], 13);
+    }).finally(()=>{
+      leaflet.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attributions: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        maxZoom: 18
+      }).addTo(this.map);
+    })
   }
 
   async showLastPosition(event, selectedTracker) {

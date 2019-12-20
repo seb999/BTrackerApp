@@ -38,7 +38,7 @@ export class TrackerPage {
         }
       } else {
         this.authenticated = false;
-        this.authService.signIn().catch(error => console.error(`Sign in error: ${error}`));
+        this.authService.signIn();
       }
     });
   }
@@ -84,14 +84,17 @@ export class TrackerPage {
   async ttnSaveTracker() {
     //Save to MQTT
     if (!this.selectedDevice.ttnDevID) {
+      this.helperService.presentLoader();
       this.mqttService.addTracker(this.selectedDevice.deviceEUI, this.selectedDevice.deviceDescription)
     }
     else {
+      this.helperService.presentLoader();
       this.mqttService.updateTracker(this.selectedDevice.deviceEUI, this.selectedDevice.deviceDescription, this.selectedDevice.ttnDevID)
     }
   }
 
   async ttnDeleteTracker() {
+    this.helperService.presentLoader();
     const alert = await this.alertController.create({
       header: 'Warning',
       message: 'Do you really want to delete this tracker ?',

@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { ToastController, Platform } from '@ionic/angular';
+import { ToastController, Platform, LoadingController  } from '@ionic/angular';
 
 @Injectable({
   providedIn: 'root'
 })
 export class HelperService {
 
-  constructor(public toast: ToastController, private platform: Platform) { }
+  constructor(public toast: ToastController, private platform: Platform, public loader: LoadingController) { }
 
   public onDevice(): boolean {
     return this.platform.is('cordova');
@@ -32,5 +32,16 @@ export class HelperService {
       duration: 2000
     });
     toast.present();
+  }
+
+  async presentLoader() {
+    const loading = await this.loader.create({
+      spinner: "lines",
+      duration: 4000,
+      message: 'Please wait...',
+      translucent: true,
+      cssClass: 'custom-class custom-loading'
+    });
+    return await loading.present();
   }
 }

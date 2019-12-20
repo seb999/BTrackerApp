@@ -13,6 +13,7 @@ import { AuthModule } from './auth/auth.module';
 import { IonicStorageModule } from '@ionic/storage';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { BackgroundMode } from '@ionic-native/background-mode/ngx';
+import { Geolocation } from '@ionic-native/geolocation/ngx'
 
 // My services 
 import { HelperService } from './service/helper.service';
@@ -34,6 +35,7 @@ import { MqttService } from './service/mqtt.service';
     MqttService,
     LocalNotifications,
     BackgroundMode,
+    Geolocation,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
   bootstrap: [AppComponent]

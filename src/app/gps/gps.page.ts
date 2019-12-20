@@ -37,7 +37,7 @@ export class GpsPage implements OnInit {
         }
       } else {
         this.authenticated = false;
-        this.authService.signIn().catch(error => console.error(`Sign in error: ${error}`));
+        this.authService.signIn();
       }
     });
   }
