@@ -97,7 +97,7 @@ export class HomePage {
     const httpSetting: HttpSettings = {
       method: "GET",
       headers: { Authorization: 'Bearer ' + this.userToken.accessToken },
-      url: this.helperService.urlBuilder("/api/Device/GetDeviceList/"),
+      url: this.helperService.urlBuilder("/api/Tracker/GetTrackerList/"),
     };
     return await this.httpService.xhr(httpSetting);
   }
@@ -201,7 +201,7 @@ export class HomePage {
     const httpSetting: HttpSettings = {
       method: "POST",
       headers: { Authorization: 'Bearer ' + this.userToken.accessToken },
-      url: this.helperService.urlBuilder("/api/Device/UpdateDevice/"),
+      url: this.helperService.urlBuilder("/api/Tracker/UpdateTracker/"),
       data: tracker,
     };
     return this.httpService.xhr(httpSetting);

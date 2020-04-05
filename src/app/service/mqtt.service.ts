@@ -9,6 +9,7 @@ export class MqttService {
   public socket:any;
   public eventMotionDetected: EventEmitter<string> = new EventEmitter();
   public eventAdded: EventEmitter<string> = new EventEmitter();
+  public eventFail: EventEmitter<string> = new EventEmitter();
   public eventUpdated: EventEmitter<string> = new EventEmitter();
   public eventDeleted: EventEmitter<string> = new EventEmitter();
 
@@ -35,6 +36,10 @@ export class MqttService {
     return this.eventAdded;
   }
 
+  public onAddedFail() {
+    return this.eventFail;
+  }
+
   public onUpdated() {
     return this.eventUpdated;
   }
@@ -57,6 +62,11 @@ export class MqttService {
     this.socket.on("ttnAddSucceeded", (ttnDevID: any) => {
       //Fire a local event that will be catch by UI
       return this.eventAdded.emit(ttnDevID);
+    })
+
+    this.socket.on("ttnAddFail", (error: any) => {
+      //Fire a local event that will be catch by UI
+      return this.eventFail.emit(error);
     })
 
     this.socket.on("ttnUpdateSucceeded", (ttnDevID: any) => {

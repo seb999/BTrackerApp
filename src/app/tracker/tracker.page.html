@@ -66,6 +66,15 @@
             name="deviceEUI"></ion-input>
         </ion-item>
 
+        <ion-item lines="full">
+          <ion-label color="primary" slot="start">Phone for SMS</ion-label>
+          <div class="item-note" slot="end" *ngIf="!editMode" style="width: 160px">
+            {{ selectedDevice.deviceTel}}
+          </div>
+          <ion-input *ngIf="editMode" [(ngModel)]="selectedDevice.deviceTel" placeholder="Enter phone number" required
+            name="deviceTel"></ion-input>
+        </ion-item>
+
         <ion-item *ngIf="!editMode" lines="full">
           <ion-label *ngIf="!editMode" color="primary" slot="start">Date added:</ion-label>
           <ion-datetime *ngIf="!editMode" fixed displayFormat="DD/MM/YYYY" [(ngModel)]="selectedDevice.dateAdded"

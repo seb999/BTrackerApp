@@ -17,7 +17,7 @@ export class TrackerPage {
   authenticated: boolean;
   userToken: any;
   trackerList: Array<any>;
-  selectedDevice: Device = { "deviceDescription": "" };
+  selectedDevice: Device = { "deviceDescription": "", deviceIsAlarmOn : false };
   onTrackerAdded: any;
 
   constructor(private authService: AuthService,
@@ -53,7 +53,7 @@ export class TrackerPage {
     const httpSetting: HttpSettings = {
       method: "GET",
       headers: { Authorization: 'Bearer ' + this.userToken.accessToken },
-      url: this.helperService.urlBuilder("/api/Device/GetDeviceList/"),
+      url: this.helperService.urlBuilder("/api/Tracker/GetTrackerList/"),
     };
     return await this.httpService.xhr(httpSetting);
   }
@@ -61,8 +61,14 @@ export class TrackerPage {
   subscribeMQTTService() {
     //On new device saved in TTN do that
     this.mqttService.onAdded().subscribe(ttnDevID => {
+      console.log("save to db new tracker");
       this.dbSaveTracker(ttnDevID);
       this.presentToast("saved!");
+    });
+
+    this.mqttService.onAddedFail().subscribe(error => {
+      console.log(error);
+      this.presentToast("Illegal ID");
     });
 
     //On device deleted from TTN do that
@@ -125,7 +131,7 @@ export class TrackerPage {
     const httpSetting: HttpSettings = {
       method: "POST",
       headers: { Authorization: 'Bearer ' + this.userToken.accessToken },
-      url: this.helperService.urlBuilder("/api/Device/SaveDevice/"),
+      url: this.helperService.urlBuilder("/api/Tracker/SaveTracker/"),
       data: this.selectedDevice,
     };
     return await this.httpService.xhr(httpSetting);
@@ -136,7 +142,7 @@ export class TrackerPage {
     const httpSetting: HttpSettings = {
       method: "GET",
       headers: { Authorization: 'Bearer ' + this.userToken.accessToken },
-      url: this.helperService.urlBuilder("/api/Device/DeleteDevice/" + ttnDevID)
+      url: this.helperService.urlBuilder("/api/Tracker/DeleteTracker/" + ttnDevID)
     };
     return await this.httpService.xhr(httpSetting);
   }
@@ -146,7 +152,7 @@ export class TrackerPage {
     const httpSetting: HttpSettings = {
       method: "POST",
       headers: { Authorization: 'Bearer ' + this.userToken.accessToken },
-      url: this.helperService.urlBuilder("/api/Device/UpdateDevice/"),
+      url: this.helperService.urlBuilder("/api/Tracker/UpdateTracker/"),
       data: this.selectedDevice,
     };
     return await this.httpService.xhr(httpSetting);
