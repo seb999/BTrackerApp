@@ -1,5 +1,6 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import socketIOClient from "socket.io-client";
+import { Platform } from '@ionic/angular';
 
 @Injectable({
   providedIn: 'root'
@@ -12,13 +13,19 @@ export class MqttService {
   public eventFail: EventEmitter<string> = new EventEmitter();
   public eventUpdated: EventEmitter<string> = new EventEmitter();
   public eventDeleted: EventEmitter<string> = new EventEmitter();
+  private loraMessageEndpoint: string;
 
-  private loraMessageEndpoint: string = "http://127.0.0.1:4001";  //DEV
+  //private loraMessageEndpoint: string = "http://127.0.0.1:4001";  //DEV
   //private loraMessageEndpoint: string = "http://dspx.eu:1884";  //PROD
 
-  constructor() {
+  constructor(private platform: Platform,) {
+    this.loraMessageEndpoint = this.onDevice() ? 'http://dspx.eu:1884' : 'http://127.0.0.1:4001';
     this.socket = socketIOClient(this.loraMessageEndpoint);
    }
+
+   public onDevice(): boolean {
+    return this.platform.is('cordova');
+  }
 
   //Use this one if you want to put the socket.on event in the client
   openConnectionDummy() {
