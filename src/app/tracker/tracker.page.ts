@@ -163,7 +163,7 @@ export class TrackerPage {
   }
 
   clearEntry() {
-    this.selectedDevice = { "deviceDescription": "", "deviceEUI": "" };
+    this.selectedDevice = { "deviceDescription": "", "deviceEUI": "", 'deviceIsAlarmOn': false  };
   }
 
   async presentToast(message) {

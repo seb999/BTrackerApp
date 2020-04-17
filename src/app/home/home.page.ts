@@ -147,7 +147,7 @@ export class HomePage {
 
     //Load data from API
     //let url = this.helperService.urlBuilder("/api/Loc/AppGetGpsData/" + selectedTracker.deviceEUI + "/" + Math.round(this.cursor/5+1));
-    let url = this.helperService.urlBuilder("/api/Loc/GetGpsData/" + selectedTracker.deviceId + "/10");
+    let url = this.helperService.urlBuilder("/api/Gps/GetGpsData/" + selectedTracker.deviceId + "/10");
 
     this.http.get<any>(url, { headers: { Authorization: 'Bearer ' + this.userToken.accessToken } }).subscribe(data => {
 

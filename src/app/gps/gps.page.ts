@@ -53,7 +53,7 @@ export class GpsPage implements OnInit {
     const httpSetting: HttpSettings = {
       method: "GET",
       headers: { Authorization: 'Bearer ' + this.userToken.accessToken },
-      url: this.helperService.urlBuilder("/api/Loc/GetGpsData/" + deviceId + "/100"),
+      url: this.helperService.urlBuilder("/api/Gps/GetGpsData/" + deviceId + "/100"),
     };
     return await this.httpService.xhr(httpSetting);
   }
@@ -62,7 +62,7 @@ export class GpsPage implements OnInit {
     const httpSetting: HttpSettings = {
       method: "GET",
       headers: { Authorization: 'Bearer ' + this.userToken.accessToken },
-      url: this.helperService.urlBuilder("/api/Loc/DeleteData/" + gpsData.gpsPositionId),
+      url: this.helperService.urlBuilder("/api/Gps/DeleteData/" + gpsData.gpsPositionId),
     };
     return await this.httpService.xhr(httpSetting);
     //this.loadGpsList();
