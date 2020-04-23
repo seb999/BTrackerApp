@@ -1,0 +1,44 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>
+      Dashboard
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card *ngIf="authenticated">
+    <ion-card-header>
+      Trackers
+    </ion-card-header>
+    <ion-card-content>
+  
+      <ion-list>
+        <ion-item *ngFor="let tracker of trackerList" (click)="showLastPosition($event,tracker)">
+          <ion-icon slot="start" name="navigate" style="margin: 0px" item-start large *ngIf=tracker.isDisplayOnMap color="primary"></ion-icon>
+          <ion-icon slot="start" style="margin: 0px" item-start large *ngIf=!tracker.isDisplayOnMap></ion-icon>
+          <ion-label> {{ tracker.deviceDescription }}</ion-label>
+          <ion-badge color="danger">{{ tracker.alert }}</ion-badge>
+          <ion-toggle slot="end" color="secondary" [(ngModel)]="tracker.deviceIsAlarmOn" [checked]="tracker.status" (click)="saveAlarm(tracker);$event.stopPropagation()" ></ion-toggle>
+          <ion-icon slot="end" name="arrow-forward" (click)="navGpsPage($event,tracker)"></ion-icon>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  
+  <div id="mainContainer">
+    <div id="mapDiv">
+      <div id="map">
+        <!-- <button id="refreshButton" (click)="initMap()">-->
+          <ion-icon id="refreshButton" name="navigate" (click)="initMap()" size="small" color="primary"></ion-icon> 
+        <!-- </button> -->
+      </div>
+    </div>
+    <div id="bars" ></div>
+  </div>
+
+</ion-content>

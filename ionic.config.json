@@ -1,5 +1,7 @@
 {
   "name": "BTrackerApp",
-  "integrations": {},
+  "integrations": {
+    "cordova": {}
+  },
   "type": "angular"
 }

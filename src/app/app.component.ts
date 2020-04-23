@@ -1,69 +1,69 @@
-import { Component, OnInit } from '@angular/core';
-
+import { Component, EventEmitter } from '@angular/core';
 import { Platform } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
+import { AuthService } from './auth/auth.service';
+import { IUserInfo } from './auth/user-info.model';
+import { AuthActions, IAuthAction } from 'ionic-appauth';
 
 @Component({
   selector: 'app-root',
-  templateUrl: 'app.component.html',
-  styleUrls: ['app.component.scss']
+  templateUrl: 'app.component.html'
 })
-export class AppComponent implements OnInit {
-  public selectedIndex = 0;
+export class AppComponent {
+  public userInfo: IUserInfo;
+  public authenticated: boolean;
+  public rootEvent: EventEmitter<string> = new EventEmitter();
   public appPages = [
     {
-      title: 'Inbox',
-      url: '/folder/Inbox',
-      icon: 'mail'
+      title: 'Dashboard',
+      url: '/home',
+      icon: 'navigate'
     },
     {
-      title: 'Outbox',
-      url: '/folder/Outbox',
-      icon: 'paper-plane'
+      title: 'Register tracker',
+      url: '/tracker',
+      icon: 'settings'
     },
-    {
-      title: 'Favorites',
-      url: '/folder/Favorites',
-      icon: 'heart'
-    },
-    {
-      title: 'Archived',
-      url: '/folder/Archived',
-      icon: 'archive'
-    },
-    {
-      title: 'Trash',
-      url: '/folder/Trash',
-      icon: 'trash'
-    },
-    {
-      title: 'Spam',
-      url: '/folder/Spam',
-      icon: 'warning'
-    }
   ];
-  public labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
 
   constructor(
     private platform: Platform,
     private splashScreen: SplashScreen,
-    private statusBar: StatusBar
+    private statusBar: StatusBar,
+    private authService: AuthService
   ) {
     this.initializeApp();
   }
 
   initializeApp() {
     this.platform.ready().then(() => {
+      this.authService.startUpAsync();
       this.statusBar.styleDefault();
       this.splashScreen.hide();
+      this.getToken();
     });
   }
 
-  ngOnInit() {
-    const path = window.location.pathname.split('folder/')[1];
-    if (path !== undefined) {
-      this.selectedIndex = this.appPages.findIndex(page => page.title.toLowerCase() === path.toLowerCase());
-    }
+  signOut() {
+    this.authService.signOut();
+  }
+
+  getToken() {
+    this.authService.authObservable.subscribe((action) => {
+      if (action.action === AuthActions.SignInSuccess || action.action === AuthActions.AutoSignInSuccess) {
+        {
+          this.authenticated = true;
+          this.getUserInfo();
+          this.rootEvent.emit("toto");
+        }
+      } else if (action.action === AuthActions.SignOutSuccess) {
+        this.authenticated = false;
+      }
+    });
+}
+
+  public async getUserInfo(): Promise<void> {
+    this.userInfo = await this.authService.getUserInfo<IUserInfo>();
   }
 }
