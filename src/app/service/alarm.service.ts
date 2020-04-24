@@ -5,6 +5,7 @@ import { AlertController } from '@ionic/angular';
 import { HttpService, HttpSettings } from '../service/http.service';
 import { AuthActions, IAuthAction } from 'ionic-appauth';
 import { AuthService } from '../auth/auth.service';
+import { StorageService } from '../service/storage.service'
 
 @Injectable({
   providedIn: 'root'
@@ -22,8 +23,10 @@ export class AlarmService {
     private localNotifications: LocalNotifications,
     public alertCtrl: AlertController,
     private httpService: HttpService,
+    private storageService: StorageService
   ) {
-    this.checkAuthentication();
+    //this.checkAuthentication();
+    this.continue();
   }
 
   checkAuthentication() {
@@ -39,7 +42,8 @@ export class AlarmService {
   }
 
   async continue(): Promise<void> {
-    this.userToken = await this.authService.getValidToken();
+    //this.userToken = await this.authService.getValidToken();
+    this.userToken = this.storageService.getItem<any>("userToken");
     this.trackerList = await this.loadTrackerList();
   }
 
@@ -55,7 +59,6 @@ export class AlarmService {
   }
 
   checkAlert(trackerEUI) {
-    console.log(this.trackerList);
     for (let index = 0; index < this.trackerList.length; index++) {
       if (this.trackerList[index].deviceIsAlarmOn && this.trackerList[index].deviceEUI == trackerEUI) {
         this.showAlert(this.trackerList[index].deviceDescription);

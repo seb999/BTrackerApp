@@ -28,11 +28,11 @@ export class GpsPage implements OnInit {
   }
 
   ngOnInit() {
-    this.helperService.presentLoader();
     this.authService.authObservable.subscribe((action) => {
       this.action = action;
       if (action.action === AuthActions.SignInSuccess || action.action === AuthActions.AutoSignInSuccess) {
         {
+          this.helperService.presentLoader();
           this.authenticated = true;
           this.continue();
         }

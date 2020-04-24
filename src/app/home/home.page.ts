@@ -49,12 +49,11 @@ export class HomePage {
   }
 
   ngOnInit() {
-    this.helperService.presentLoader();
     this.authService.authObservable.subscribe((action) => {
       this.action = action;
       if (action.action === AuthActions.SignInSuccess || action.action === AuthActions.AutoSignInSuccess) {
         {
-          console.log("authenticated");
+          this.helperService.presentLoader();
           this.authenticated = true;
           this.continue();
         }
@@ -64,8 +63,6 @@ export class HomePage {
       }
     });
   }
-
- 
 
   async continue(): Promise<void> {
     this.userToken = await this.authService.getValidToken();
@@ -104,7 +101,6 @@ export class HomePage {
   }
 
   displayAlarm(trackerEUI: string) {
-    console.log(this.trackerList);
     if (trackerEUI == undefined) return;
     for (let index = 0; index < this.trackerList.length; index++) {
       if (this.trackerList[index].deviceIsAlarmOn && this.trackerList[index].deviceEUI == trackerEUI) {
@@ -196,7 +192,6 @@ export class HomePage {
 
   //Update alarm stracker
   saveAlarm(tracker) {
-    console.log(tracker);
     tracker.alert = "";
     this.mqttService.alarmTrackerEUI = "";
     this.helperService.presentToast(tracker);

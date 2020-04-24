@@ -19,7 +19,9 @@ export class MqttService {
 
   constructor(private platform: Platform, 
     private alarmService: AlarmService,) {
-    this.loraMessageEndpoint = this.onDevice() ? 'http://dspx.eu:1884' : 'http://127.0.0.1:4001';
+    console.log("MQTT SERVICE CONSTRUCTOR")
+    // this.loraMessageEndpoint = this.onDevice() ? 'http://dspx.eu:1884' : 'http://127.0.0.1:4001';
+    this.loraMessageEndpoint = this.onDevice() ? 'http://dspx.eu:1884' : 'http://dspx.eu:1884';
     this.openListener();
    }
 

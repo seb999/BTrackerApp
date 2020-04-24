@@ -30,10 +30,10 @@ export class TrackerPage {
   }
 
   ngOnInit() {
-    this.helperService.presentLoader();
     this.authService.authObservable.subscribe((action) => {
       if (action.action === AuthActions.SignInSuccess || action.action === AuthActions.AutoSignInSuccess) {
         {
+          this.helperService.presentLoader();
           this.authenticated = true;
           this.continue();
         }
