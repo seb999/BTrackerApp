@@ -59,10 +59,8 @@ export class MqttService {
     socket.on("ttnMotionDetected", (trackerEUI: any) => {
       //Fire a local event that will be catch by UI
       this.alarmService.checkAlert(trackerEUI);
-      console.log("alert");
       this.alarmTrackerEUI = trackerEUI;
       return this.eventMotionDetected.emit(trackerEUI);
-    
     });
 
     socket.on("ttnAddSucceeded", (ttnDevID: any) => {

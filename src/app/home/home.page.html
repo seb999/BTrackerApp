@@ -22,7 +22,7 @@
           <ion-icon slot="start" style="margin: 0px" item-start large *ngIf=!tracker.isDisplayOnMap></ion-icon>
           <ion-label> {{ tracker.deviceDescription }}</ion-label>
           <ion-badge color="danger">{{ tracker.alert }}</ion-badge>
-          <ion-toggle slot="end" color="secondary" [(ngModel)]="tracker.deviceIsAlarmOn" [checked]="tracker.status" (click)="saveAlarm(tracker);$event.stopPropagation()" ></ion-toggle>
+          <ion-toggle slot="end" color="secondary" [(ngModel)]="tracker.deviceIsAlarmOn" [checked]="tracker.deviceIsAlarmOn" (ionChange)="saveAlarm(tracker);$event.stopPropagation()" ></ion-toggle>
           <ion-icon slot="end" name="arrow-forward" (click)="navGpsPage($event,tracker)"></ion-icon>
         </ion-item>
       </ion-list>

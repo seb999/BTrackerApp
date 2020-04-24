@@ -55,40 +55,40 @@ export class AlarmService {
   }
 
   checkAlert(trackerEUI) {
+    console.log(this.trackerList);
     for (let index = 0; index < this.trackerList.length; index++) {
       if (this.trackerList[index].deviceIsAlarmOn && this.trackerList[index].deviceEUI == trackerEUI) {
         this.showAlert(this.trackerList[index].deviceDescription);
+        this.trackerList[index].alert = "Alarm";
       }
     }
   }
 
   async showAlert(trackerDescription: string) {
-    console.log("ring the bell");
     if (this.helperService.onDevice()) {
       //Push notification on device
       this.localNotifications.schedule({
         id: 1,
         text: 'PUSH : BTracker Warning!',
-        sound: 'file://ressources/sounds/notification.ogg', 
+        sound: 'file://ressources/sounds/notification.ogg',
         data: { secret: 999 }
       });
     }
-    else {
-      //alert popup on browser
-      if (!this.alertClosed) return;
-      this.alertClosed = false;
-      const alert = await this.alertCtrl.create({
-        header: 'BTracker Warning!',
-        subHeader: 'Motion detected on tracker: ',
-        message: trackerDescription,
-        buttons: [{
-          text: 'OK', role: 'cancel',
-          handler: () => {
-            this.alertClosed = true;
-          }
-        }]
-      });
-      await alert.present();
-    }
+
+    //alert popup on browser
+    if (!this.alertClosed) return;
+    this.alertClosed = false;
+    const alert = await this.alertCtrl.create({
+      header: 'BTracker Warning!',
+      subHeader: 'Motion detected on tracker: ',
+      message: trackerDescription,
+      buttons: [{
+        text: 'OK', role: 'cancel',
+        handler: () => {
+          this.alertClosed = true;
+        }
+      }]
+    });
+    await alert.present();
   }
 }
