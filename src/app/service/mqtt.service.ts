@@ -2,13 +2,15 @@ import { Injectable, EventEmitter } from '@angular/core';
 import socketIOClient from "socket.io-client";
 import { Platform } from '@ionic/angular';
 import { AlarmService } from '../service/alarm.service';
+import { BackgroundMode } from '@ionic-native/background-mode/ngx';
+import { HelperService } from '../service/helper.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MqttService {
   public socketIO: any;
-  public socket:any;
+  public socket: any;
   public eventMotionDetected: EventEmitter<string> = new EventEmitter();
   public eventAdded: EventEmitter<string> = new EventEmitter();
   public eventFail: EventEmitter<string> = new EventEmitter();
@@ -17,17 +19,18 @@ export class MqttService {
   private loraMessageEndpoint: string;
   public alarmTrackerEUI: any;
 
-  constructor(private platform: Platform, 
-    private alarmService: AlarmService,) {
-    console.log("MQTT SERVICE CONSTRUCTOR")
+  constructor(private platform: Platform,
+    private helperService: HelperService,
+    private backgroundMode: BackgroundMode,
+    private alarmService: AlarmService, ) {
     // this.loraMessageEndpoint = this.onDevice() ? 'http://dspx.eu:1884' : 'http://127.0.0.1:4001';
     this.loraMessageEndpoint = this.onDevice() ? 'http://dspx.eu:1884' : 'http://dspx.eu:1884';
     this.openListener();
-   }
+  }
 
-   public onDevice(): boolean {
+  public onDevice(): boolean {
     return this.platform.is('cordova');
-  } 
+  }
 
   //////////////////////////////////////////////////
   //1 - Client subscribe to those events methods////

@@ -30,11 +30,13 @@
     "@ionic/storage": "^2.2.0",
     "@oktadev/schematics": "^2.0.2",
     "@types/leaflet": "^1.5.12",
-    "cordova-android": "8.1.0",
+    "cordova-android": "^8.1.0",
+    "cordova-plugin-background-mode": "git+https://github.com/katzer/cordova-plugin-background-mode.git",
     "cordova-plugin-badge": "^0.8.8",
     "cordova-plugin-geolocation": "^4.0.2",
     "cordova-plugin-local-notification": "^0.9.0-beta.2",
     "cordova-plugin-nativegeocoder": "^3.4.0",
+    "cordova-plugin-powermanagement-orig": "git+https://github.com/boltex/cordova-plugin-powermanagement.git",
     "core-js": "^2.5.4",
     "ionic-appauth": "^0.5.1",
     "leaflet": "^1.5.1",
@@ -93,11 +95,12 @@
       "cordova-plugin-ionic-keyboard": {},
       "cordova-plugin-nativegeocoder": {},
       "cordova-plugin-geolocation": {},
-      "cordova-plugin-local-notification": {}
+      "cordova-plugin-local-notification": {},
+      "cordova-plugin-background-mode": {}
     },
     "platforms": [
-      "android",
-      "ios"
+      "ios",
+      "android"
     ]
   }
 }

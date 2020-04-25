@@ -5,7 +5,8 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { AuthService } from './auth/auth.service';
 import { IUserInfo } from './auth/user-info.model';
 import { AuthActions, IAuthAction } from 'ionic-appauth';
-import { StorageService } from './service/storage.service'
+import { StorageService } from './service/storage.service';
+import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 
 @Component({
   selector: 'app-root',
@@ -29,6 +30,7 @@ export class AppComponent {
   ];
 
   constructor(
+    private backgroundMode: BackgroundMode,
     private platform: Platform,
     private splashScreen: SplashScreen,
     private statusBar: StatusBar,
@@ -39,12 +41,19 @@ export class AppComponent {
   }
 
   initializeApp() {
-    console.log("APP COMPONENT")
     this.platform.ready().then(() => {
+      console.log("in platform method");
       this.authService.startUpAsync();
       this.statusBar.styleDefault();
       this.splashScreen.hide();
-      this.getToken();
+
+      //Activate background mode
+      this.backgroundMode.on('enable').subscribe((p)=>{ console.log("background activated")});
+      this.backgroundMode.setDefaults({ silent: true });
+      this.backgroundMode.on('activate').subscribe((p)=>{ this.backgroundMode.disableWebViewOptimizations()});
+      this.backgroundMode.enable();
+      
+    this.getToken();
     });
   }
 

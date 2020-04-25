@@ -3,21 +3,22 @@ import { HelperService } from '../service/helper.service';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { AlertController } from '@ionic/angular';
 import { HttpService, HttpSettings } from '../service/http.service';
-import { AuthActions, IAuthAction } from 'ionic-appauth';
 import { AuthService } from '../auth/auth.service';
-import { StorageService } from '../service/storage.service'
+import { StorageService } from '../service/storage.service';
+import { BackgroundMode } from '@ionic-native/background-mode/ngx';
+import { Platform } from '@ionic/angular';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AlarmService {
-  private counter: number = 0;
   private alertClosed: boolean = true;
   private userToken: any;
   public trackerList: Array<any> = [];
 
-
   constructor(
+    private platform: Platform,
+    private backgroundMode: BackgroundMode,
     private authService: AuthService,
     private helperService: HelperService,
     private localNotifications: LocalNotifications,
@@ -25,24 +26,11 @@ export class AlarmService {
     private httpService: HttpService,
     private storageService: StorageService
   ) {
-    //this.checkAuthentication();
     this.continue();
   }
 
-  checkAuthentication() {
-    this.authService.authObservable.subscribe((action) => {
-      if (action.action === AuthActions.SignInSuccess || action.action === AuthActions.AutoSignInSuccess) {
-        {
-          this.continue();
-        }
-      } else {
-        this.authService.signIn();
-      }
-    });
-  }
-
   async continue(): Promise<void> {
-    //this.userToken = await this.authService.getValidToken();
+    //Get token from local storage
     this.userToken = this.storageService.getItem<any>("userToken");
     this.trackerList = await this.loadTrackerList();
   }

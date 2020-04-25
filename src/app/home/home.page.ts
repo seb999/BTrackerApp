@@ -1,11 +1,9 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { NavController} from '@ionic/angular';
-import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 import { AuthService } from '../auth/auth.service';
 import { IUserInfo } from '../auth/user-info.model';
 import { AuthActions, IAuthAction } from 'ionic-appauth';
 import { HelperService } from '../service/helper.service';
-import { StorageService } from '../service/storage.service';
 import { HttpClient } from '@angular/common/http';
 import { HttpService, HttpSettings } from '../service/http.service';
 import { Geolocation } from '@ionic-native/geolocation/ngx'
@@ -37,16 +35,11 @@ export class HomePage {
   constructor(private navCtrl: NavController,
     private authService: AuthService,
     private helperService: HelperService,
-    //private storageService: StorageService,
     private httpService: HttpService,
     private http: HttpClient,
-    private backgroundMode: BackgroundMode,
     private mqttService: MqttService,
     private geoLocation: Geolocation,
-  ) {
-
-    //this.backgroundMode.enable();
-  }
+  ) {}
 
   ngOnInit() {
     this.authService.authObservable.subscribe((action) => {
@@ -70,7 +63,8 @@ export class HomePage {
     this.subscribeMQTTService();
     this.validateLocalUserId();
     this.trackerList = await this.loadTrackerList();
-    this.displayAlarm(this.mqttService.alarmTrackerEUI); //we read from mqtt if an alarm as been fired and we come after to the page
+    //we read from mqtt if an alarm as been fired and we come after to the page
+    this.displayAlarm(this.mqttService.alarmTrackerEUI); 
     this.helperService.dismissLoader();
   }
 
@@ -93,11 +87,8 @@ export class HomePage {
   }
 
   subscribeMQTTService() {
-    //All done in mqttService injected in constructor
-    //1 - Subsribe to onMotion event
+    // Subsribe to onMotion from our mqttService
     this.mqttService.onMotion().subscribe(TracketEUI => this.displayAlarm(TracketEUI));
-    //2 - Start to listen MQTT events
-    //this.mqttService.openListener();
   }
 
   displayAlarm(trackerEUI: string) {
